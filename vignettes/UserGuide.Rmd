@@ -1,0 +1,252 @@
+---
+title: "User Guide"
+author: "Kenneth Condon"
+date: "`r Sys.Date()`"
+output: 
+    html_document:
+        number_sections: true
+        theme: cerulean
+        highlight: default
+        toc: TRUE
+        toc_depth: 3
+        toc_float:
+            collapsed: TRUE
+            smooth_scroll: FALSE
+---
+
+```{r setup, include = FALSE}
+library(knitr)
+library(tispec)
+knitr::opts_chunk$set(
+    out.width = "600px", # sets image sizes
+    fig.align = "center",
+    collapse = TRUE,
+    comment = ">"
+)
+#wd <- '/home/kenneth/Documents/projects/rpackages' # laptop
+wd <- '/home/kcondon/NGS/users/Kenneth/rpackages' # desktop
+```
+
+<style>
+body {text-align: justify}
+</style>
+
+---
+# Introduction
+
+This package is an adaptable and efficient implementation of the tau specificity algorithm^[Yanai, I., Benjamin, H., Shmoish, M., Chalifa-Caspi, V., Shklar, M., Ophir, R., Bar-Even, A., Horn-Saban, S., Safran, M., Domany, E., Lancet, D., Shmueli, O., 2005. Genome-wide midrange transcription profiles reveal expression level relationships in human tissue specification. Bioinformatics (Oxford, England). 21, 650-659.] benchmarked in 2016 by Kryuchkova-Mostacci &  Robinson-Rechavi^[Kryuchkova-Mostacci, N. &  Robinson-Rechavi, M., 2016. A benchmark of gene expression tissue-specificity metrics. Briefings in Bioinformatics.]. To utilise this downstream RNA-seq analysis step, the user first runs their own RNA-seq analysis pipeline and normalisation steps to produce a set of counts (e.g. FPKM, RPKM, TPM) for each gene in each tissue according to the user preference. Many algorithms have been developed for measuring tissue specificity, and they all fall into 1 of 2 categories:
+
+* Algorithms that reduce the tissue specificity of a gene to a single value as a global measure of the gene’s specificity
+* Algorithms that reduce the tissue specificity of a gene to a set of values, 1 per tissue, as a profile of the specificity of a gene for each tissue
+
+The tau specificity algorithm was implemented in this package because:
+
+* Tau is consistently robust
+* Tau results between different data set sizes show the highest correlation
+* Tau does not show bias toward finding housekeeping genes
+* Tau finds the greatest number of tissue specific genes
+* Enrichment analysis shows that the functions of those tissue specific genes found only by tau are consistent with the functions of the tissues in which they are found
+
+Using both human and mouse RNA-seq data, the benchmark paper compared 9 algorithms: 
+
+* Raw counts 
+* Tau^[Yanai, I., Benjamin, H., Shmoish, M., Chalifa-Caspi, V., Shklar, M., Ophir, R., Bar-Even, A., Horn-Saban, S., Safran, M., Domany, E., Lancet, D., Shmueli, O., 2005. Genome-wide midrange transcription profiles reveal expression level relationships in human tissue specification. Bioinformatics (Oxford, England). 21, 650-659.]
+* Gini coefficient (adapted from economics theory)
+* Tissue specificity index (TSI)^[Julien, P., Brawand, D., Soumillon, M., Necsulea, A., Liechti, A., Schutz, F., Daish, T., Grutzner, F., Kaessmann, H., 2012. Mechanisms and evolutionary patterns of mammalian and avian dosage compensation. PLoS Biology. 10, e1001328.]
+* Shannon entropy (Hg)^[Schug, J., Schuller, W.P., Kappen, C., Salbaum, J.M., Bucan, M., Stoeckert, C.J.,Jr, 2005. Promoter features related to tissue specificity as measured by Shannon entropy. Genome Biology. 6, R33.]
+* Z-score^[Vandenbon, A. &  Nakai, K., 2010. Modeling tissue-specific structural patterns in human and mouse promoters. Nucleic Acids Research. 38, 17-25.]
+* Specificity measure (SPM)^[Xiao, S.J., Zhang, C., Zou, Q., Ji, Z.L., 2010. TiSGeD: a database for tissue-specific genes. Bioinformatics (Oxford, England). 26, 1273-1275.]
+* Expression enrichment (EE)^[Yu, X., Lin, J., Zack, D.J., Qian, J., 2006. Computational analysis of tissue-specific combinatorial gene regulation: predicting interaction between transcription factors in human tissues. Nucleic Acids Research. 34, 4925-4936.]
+* Preferential expression measure (PEM)^[Huminiecki, L., Lloyd, A.T., Wolfe, K.H., 2003. Congruence of tissue expression profiles from Gene Expression Atlas, SAGEmap and TissueInfo databases. BMC Genomics. 4, 31.]. 
+
+The benchmarking results (fig. 1) show that every algorithm produces a bimodal distribution identifying 3 clear groups: 
+
+* 0-0.2 tissue specificity (non/low specificity, housekeeping genes)
+* 0.2-0.8 tissue specificity (intermediate specificity)
+* 0.8-1.0 tissue specificity (high/absolute specificity)
+
+The authors identified the best performing algorithms as tau, gini and counts. However the authors state that counts is only robust if the correct expression threshold/cut-off is chosen and gini doesn’t normalise for expression amplitude between tissues, while tau normalises for amplitude between tissues and also includes the number of tissues as part of the algorithm.
+
+```{r, echo = FALSE, fig.cap = "Figure 1: Distribution of tissue specificity by algorithm used."}
+include_graphics(paste(wd,'/tispec/misc/images/benchmark.png',sep = ''))
+```
+
+The key conclusions of the benchmark were as follows:
+
+* Tau showed the strongest correlation between results regardless of tissue numbers included
+* Of the 9 algorithms compared in the benchmark paper, only tau avoided a bias toward classifying most genes as housekeeping and as a possible consequence, tau identified the most tissue specific genes including genes not detected by any other algorithm
+* Gene Ontology enrichment suggests the extra tissue specific genes found by tau were due to false negatives in other algorithms rather than false positives in tau
+* Additionally, the authors compared the effect of calculating tissue specificity using RPKM values or log transformed values and found:
+    + Using RPKM detects more tissue specificity to the extent that the 0-0.2 tissue specificity group (housekeeping genes) may be lost completely
+    + Using RPKM reduces correlation between both between tissue subsets and between species.
+
+# Workflow
+
+```{r, echo = FALSE, fig.cap = "Figure 2: Calculating tissue specificity"}
+include_graphics(paste(wd,'/tispec/misc/workflow/workflow.png',sep = ''))
+```
+
+## Input
+
+Users run their preferred RNA-seq analysis pipeline to calculate a single expression value for each gene in each tissue (e.g. mean TPM). Currently the package supports data from mouse, human and macaque. All genes should named by their Ensembl Gene IDs (e.g. ENSMUSG00000066232). This is to allow biomaRt annotation later in the workflow. Take care to annotate all genes using the same ensembl version (all versions from ensembl 79 onward are supported). This is important to ensure no genes are excluded from the pipeline due to discontinued Ensembl Gene IDs. The package takes as input a single dataframe where the first column is the Ensembl Gene ID, each subsequent column header is a tissue name, and the cells contain the user defined expression values of all genes in all tissues.
+
+```{r}
+library(tispec)
+head(meanExp[,1:5], n=5)
+```
+
+## Normalisation
+
+For each tissue independently, the input data should be normalised so that differences in expression between 1 gene and another within the tissue can be compared while reducing the effect of outliers on the output. A pseudo count is added to log2 transform the data, and a threshold of log2(0) is set. This means that all genes with input values below 1.0 will be defined as non-expressed. All genes not expressed in any tissue are then removed from the data. Finally, to allow comparison of gene expression across different tissues that may come from different experiments/laboratories, the log2 transformed data frame is quantile normalised which makes the distribution of data in each tissue statistically identical to each other. Remember, now the expression values are on a log scale, so +1 difference represents a 10x difference in expression.  
+
+```{r, eval=FALSE}
+log2Exp <- log2Tran(meanExp) 
+```
+```{r}
+head(log2Exp[,1:5], n=5)
+```
+```{r, eval=FALSE}
+qnExp <- quantNorm(log2Exp)
+```
+```{r}
+head(qnExp[,1:5], n=5)
+```
+
+## Calculate Tissue Specificity
+
+After normalisation, implementation of the tau specificity algorithm assigns each gene a tau value between 0-1.
+
+* Absolutely specific genes (ASGs): 
+    * Genes expressed in a single tissue only
+    * Defined by a tau value of 1 
+* Highly specific genes (HSGs): 
+    * Genes with relatively highly enriched expression in a few tissues
+    * Defined by a tau value of at least 0.85. 
+* Housekeeping genes: 
+    * Genes expressed in many (or all) tissues with no enriched expression
+    * Defined by a tau value of at most 0.2.
+
+The tau value only defines the "specificity" of a gene. To determine which tissue the gene is actually specific for, requires calculation of tau expression fractions (Tef). As can be seen in the worked example in figure 2, gene X is a HSG with a tau value of 0.95. However, calculating Tef identifies that Gene X is highly specific for tissue B (0.95 Tef), with additional but much lower specificity for tissue C (0.24 Tef). Targetting gene X in tissue B, may produce off-target effects in tissue C.
+
+```{r, eval=FALSE}
+tauExp <- calcTau(qnExp) 
+```
+```{r}
+head(tauExp[,1:5], n=5)
+```
+
+The output of 'calcTau' now begins with an extra column containing the tau value of each gene, while each tissue column is now populated with tau expression fractions. 
+
+## Biomart Annotation
+
+Next, using the biomaRt package, the gene name and type are added to each ensembl gene ID.
+
+```{r, eval=FALSE}
+tauAnno <- getMart(x = 'mouse', y = 79, z = tauExp)
+```
+```{r}
+head(tauAnno[,1:5], n=5)
+```
+
+The data frame output now contains all the information required and allows easy user interaction with the following functions.
+
+# Additional Useful Functions
+
+## Specific gene distribution
+
+```{r, eval=FALSE}
+plotDensity(tauAnno) 
+```
+
+```{r, echo = FALSE}
+include_graphics(paste(wd,'/tispec/misc/images/density.png',sep = ''))
+```
+
+## Specific gene counts
+
+```{r}
+asg <- getDist(tauAnno, 1)
+head(asg, n = 5)
+
+hsg <- getDist(tauAnno, 0.85)
+head(hsg, n = 5)
+```
+
+```{r, eval=FALSE}
+plotDist(tauAnno)
+```
+
+```{r, echo = FALSE}
+include_graphics(paste(wd,'/tispec/misc/images/dist.png',sep = ''))
+```
+
+## Study a tissue of interest
+
+```{r, eval=FALSE}
+tissueA <- getTissue('tissueA', qnExp, tauAnno)
+```
+
+```{r}
+head(tissueA, n = 5)
+```
+
+The function getTissue retrieves the quantile normalised expression and tissue specificity of every gene in a named tissue. Notice H19 is an absolutely specific gene (ASG, tau 1) and is not expressed  in this tissue (qn 0). Likewise Pbsn is a highly specific gene (HSG, tau 0.911) and is also not expressed in this tissue (qn 0). To identify for which tissues those genes are specific requires the [plotGene](#plotGene) function. However, organising the data like this multiple other useful functions: [plotCorr](#plotCorr), [plotTop](#plotTop), and [getControls](#getControls).
+
+### Plot correlation between specificity and expression {#plotCorr}
+
+```{r, eval=FALSE}
+corrPlots <- plotCorr(tissueA)
+corrPlots$global
+corrPlots$local
+```
+
+```{r, echo=FALSE}
+include_graphics(paste(wd,'/tispec/misc/images/corrglobal.png',sep = ''))
+```
+
+There is a negative correlation (r = -0.59) as reflected in the trendline. As the specificity of a gene **for ANY tissue** increases, the expression of the gene in tissueA decreases. However, many tissueA absolutely specific genes (orange) still have relatively high expression.
+
+```{r, echo=FALSE}
+include_graphics(paste(wd,'/tispec/misc/images/corrlocal.png',sep = ''))
+```
+
+There is a positive correlation (r = 0.55). However, the trendline shows an initial strong positive correlation that plateaus from 0.1 specificity (frac). As specificity of a gene **for tissueA** increases above 0.1, there is little effect on expression. This is clearly shown by the wide range of expression of genes that are absolutely specific (orange) or highly specific (yellow) for tissueA. To get genes that are both highly specific and highly expressed use [plotTop](#plotTop).
+
+### Plot the tissue specific genes that are also highly expressed {#plotTop}
+
+Ranking of genes by both expression and specificity is useful for anyone working on a single tissue wanting to identify a set of genes that are both 1) highly specific to the tissue, and 2) expressed in high enough quantities to make assaying them easier:
+
+```{r, eval=FALSE}
+plotTop(tauAnno, tissueA, 5)
+```
+
+```{r, echo = FALSE}
+include_graphics(paste(wd,'/tispec/misc/images/topA.png',sep = ''))
+```
+
+The plot shows the top 5 expressed highly specific genes for tissueA. The plot also shows all other tissues in which those genes are expressed so as to facilitate prediction of potential off target affects of any biological experiments (e.g. CRISPR).
+
+### Get a set of control genes {#getControls}
+
+```{r}
+controls <- getControls(tissueA, tissueB)
+head(controls$tissueA, n = 5)
+```
+
+The genes listed are either highly or absolutely specific for tissueA, with quantile normalised expression less than 0.1 in tissue B. This is useful for getting a set of control genes to differentiate between two tissues.
+
+## Study a gene of interest {#plotGene}
+
+```{r}
+subset(tauAnno, tauAnno$external_gene_name == 'Gnai3') # gene name is case sensitive
+```
+
+```{r, eval=FALSE}
+plotGene(tauAnno, 'Gnai3')
+```
+
+```{r, echo = FALSE}
+include_graphics(paste(wd,'/tispec/misc/images/gene.png',sep = ''))
+```
+
+
