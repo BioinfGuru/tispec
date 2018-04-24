@@ -24,7 +24,8 @@ knitr::opts_chunk$set(
     comment = ">"
 )
 #wd <- '/home/kenneth/Documents/projects/rpackages' # laptop
-wd <- '/home/kcondon/NGS/users/Kenneth/rpackages' # desktop
+#wd <- '/home/kcondon/NGS/users/Kenneth/rpackages' # desktop
+wd <- paste(getwd(), '/images/', sep = '') # should work on any machine
 ```
 
 <style>
@@ -68,7 +69,7 @@ The benchmarking results (fig. 1) show that every algorithm produces a bimodal d
 The authors identified the best performing algorithms as tau, gini and counts. However the authors state that counts is only robust if the correct expression threshold/cut-off is chosen and gini doesn’t normalise for expression amplitude between tissues, while tau normalises for amplitude between tissues and also includes the number of tissues as part of the algorithm.
 
 ```{r, echo = FALSE, fig.cap = "Figure 1: Distribution of tissue specificity by algorithm used."}
-include_graphics(paste(wd,'/tispec/misc/images/benchmark.png',sep = ''))
+include_graphics(paste(wd,'benchmark.png',sep = ''))
 ```
 
 The key conclusions of the benchmark were as follows:
@@ -83,7 +84,7 @@ The key conclusions of the benchmark were as follows:
 # Workflow
 
 ```{r, echo = FALSE, fig.cap = "Figure 2: Calculating tissue specificity"}
-include_graphics(paste(wd,'/tispec/misc/workflow/workflow.png',sep = ''))
+include_graphics(paste(wd,'workflow.png',sep = ''))
 ```
 
 ## Input
@@ -159,7 +160,7 @@ plotDensity(tauAnno)
 ```
 
 ```{r, echo = FALSE}
-include_graphics(paste(wd,'/tispec/misc/images/density.png',sep = ''))
+include_graphics(paste(wd,'density.png',sep = ''))
 ```
 
 ## Specific gene counts
@@ -177,7 +178,7 @@ plotDist(tauAnno)
 ```
 
 ```{r, echo = FALSE}
-include_graphics(paste(wd,'/tispec/misc/images/dist.png',sep = ''))
+include_graphics(paste(wd,'dist.png',sep = ''))
 ```
 
 ## Study a tissue of interest
@@ -201,13 +202,13 @@ corrPlots$local
 ```
 
 ```{r, echo=FALSE}
-include_graphics(paste(wd,'/tispec/misc/images/corrglobal.png',sep = ''))
+include_graphics(paste(wd,'corrglobal.png',sep = ''))
 ```
 
 There is a negative correlation (r = -0.59) as reflected in the trendline. As the specificity of a gene **for ANY tissue** increases, the expression of the gene in tissueA decreases. However, many tissueA absolutely specific genes (orange) still have relatively high expression.
 
 ```{r, echo=FALSE}
-include_graphics(paste(wd,'/tispec/misc/images/corrlocal.png',sep = ''))
+include_graphics(paste(wd,'corrlocal.png',sep = ''))
 ```
 
 There is a positive correlation (r = 0.55). However, the trendline shows an initial strong positive correlation that plateaus from 0.1 specificity (frac). As specificity of a gene **for tissueA** increases above 0.1, there is little effect on expression. This is clearly shown by the wide range of expression of genes that are absolutely specific (orange) or highly specific (yellow) for tissueA. To get genes that are both highly specific and highly expressed use [plotTop](#plotTop).
@@ -221,7 +222,7 @@ plotTop(tauAnno, tissueA, 5)
 ```
 
 ```{r, echo = FALSE}
-include_graphics(paste(wd,'/tispec/misc/images/topA.png',sep = ''))
+include_graphics(paste(wd,'topA.png',sep = ''))
 ```
 
 The plot shows the top 5 expressed highly specific genes for tissueA. The plot also shows all other tissues in which those genes are expressed so as to facilitate prediction of potential off target affects of any biological experiments (e.g. CRISPR).
@@ -246,7 +247,7 @@ plotGene(tauAnno, 'Gnai3')
 ```
 
 ```{r, echo = FALSE}
-include_graphics(paste(wd,'/tispec/misc/images/gene.png',sep = ''))
+include_graphics(paste(wd,'gene.png',sep = ''))
 ```
 
 

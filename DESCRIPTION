@@ -2,10 +2,9 @@ Package: tispec
 Type: Package
 Title: Calculates tissue specificity from RNA-seq data
 Version: 0.99.0
-Author: Kenneth Condon <roonysgalbi@gmail.com>
-Maintainer: Kenneth Condon <roonysgalbi@gmail.com>
+Authors@R: person("Kenneth", "Condon", role = c("aut", "cre"), email = "roonysgalbi@gmail.com")
 Description: Implementing the TAU algorithm to calculate tissue specificity. This package takes a given a set of observations in a given set of variables. It then calculates the specificity of each observation for each variable. For example: given RNA-seq counts (rpkm/fpkm/tpm etc.) in multiple tissues, calculates tissue specificity of each gene for each tissue.
-License: GPL-3
+License: file LICENSE
 biocViews: GeneExpression
 Depends: R (>= 3.4.3)
 Imports: ggplot2,
