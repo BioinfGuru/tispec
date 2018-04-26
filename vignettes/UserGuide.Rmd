@@ -182,6 +182,8 @@ include_graphics(paste(wd,'dist.png',sep = ''))
 
 ## Study a tissue of interest
 
+### Extract your tissue
+
 ```{r, eval=FALSE}
 tissueA <- getTissue('tissueA', qnExp, tauAnno)
 ```
@@ -192,7 +194,30 @@ head(tissueA, n = 5)
 
 The function getTissue retrieves the quantile normalised expression and tissue specificity of every gene in a named tissue and uses this information to create a score column. Each gene's score is between 0 and 2, and is the sum of it's tau expression fraction value and it's 0-1 ranged normalised expression value. The gene with both the highest expression and specificity recieves the highest score.
 
-Notice H19 is an absolutely specific gene (ASG, tau 1) and is not expressed  in this tissue (qn 0). Likewise Pbsn is a highly specific gene (HSG, tau 0.911) and is also not expressed in this tissue (qn 0). To identify for which tissues those genes are specific requires the [plotGene](#plotGene) function. However, organising the data like this multiple other useful functions: [plotCorr](#plotCorr), [plotTop](#plotTop), and [getControls](#getControls).
+Notice H19 is an absolutely specific gene (ASG, tau 1) and is not expressed  in this tissue (qn 0). Likewise Pbsn is a highly specific gene (HSG, tau 0.911) and is also not expressed in this tissue (qn 0). To identify for which tissues those genes are specific requires the [plotGene](#plotGene) function. However, organising the data like this multiple other useful functions: [getOptimum](#getOptimum), [plotCorr](#plotCorr), and [getControls](#getControls).
+
+### Get a highly specific, highly expressed, optimal gene set {#getOptimum}
+
+Ranking of genes by both expression and specificity is useful for anyone working on a single tissue wanting to identify a set of genes 1) that are highly specific to the tissue, 2) that are expressed in high enough quantities to facilitate bench work in the laboratory, and 3) with minimal expression in other tissues to reduce risk of off target effects:
+
+```{r}
+optimum <- getOptimum(tauAnno, tissueA, 5)
+optimum$dataframe
+```
+
+```{r, eval = FALSE}
+optimum$barplot
+```
+
+```{r, echo = FALSE}
+include_graphics(paste(wd,'optimum.png',sep = ''))
+```
+
+The plot shows the top 5 optimal genes for tissue A. Arl11 and Tial1 are absolutely specific with high expression, while the other 3 genes are still highly specific for tissue A but their expression in other tissues is minimal. The plot shows all other tissues in which those genes are expressed so as to facilitate prediction of potential off target affect of any biological experiments (e.g. CRISPR). To confirm these findings simply extract the expression values of these genes from the input data. Notice the high expression in tissueA, and minimal expression elsewhere.
+
+```{r}
+meanExp[c(rownames(optimum$dataframe)),]
+```
 
 ### Plot correlation between specificity and expression {#plotCorr}
 
@@ -212,21 +237,7 @@ There is a negative correlation (r = -0.59) as reflected in the trendline. As th
 include_graphics(paste(wd,'corrlocal.png',sep = ''))
 ```
 
-There is a positive correlation (r = 0.55). However, the trendline shows an initial strong positive correlation that plateaus from 0.1 specificity (frac). As specificity of a gene **for tissueA** increases above 0.1, there is little effect on expression. This is clearly shown by the wide range of expression of genes that are absolutely specific (orange) or highly specific (yellow) for tissueA. To get genes that are both highly specific and highly expressed use [plotTop](#plotTop).
-
-### Plot the tissue specific genes that are also highly expressed {#plotTop}
-
-Ranking of genes by both expression and specificity is useful for anyone working on a single tissue wanting to identify a set of genes that are both 1) highly specific to the tissue, and 2) expressed in high enough quantities to make assaying them easier:
-
-```{r, eval=FALSE}
-plotTop(tauAnno, tissueA, 5)
-```
-
-```{r, echo = FALSE}
-include_graphics(paste(wd,'topA.png',sep = ''))
-```
-
-The plot shows the top 5 expressed highly specific genes for tissueA. The plot also shows all other tissues in which those genes are expressed so as to facilitate prediction of potential off target affects of any biological experiments (e.g. CRISPR).
+There is a positive correlation (r = 0.55). However, the trendline shows an initial strong positive correlation that plateaus from 0.1 specificity (frac). As specificity of a gene **for tissueA** increases above 0.1, there is little effect on expression. This is clearly shown by the wide range of expression of genes that are absolutely specific (orange) or highly specific (yellow) for tissueA. To get genes that are both highly specific and highly expressed use [getOptimum](#getOptimum).
 
 ### Get a set of control genes {#getControls}
 
