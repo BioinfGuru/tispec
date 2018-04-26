@@ -23,8 +23,7 @@ knitr::opts_chunk$set(
     collapse = TRUE,
     comment = ">"
 )
-#wd <- '/home/kenneth/Documents/projects/rpackages' # laptop
-#wd <- '/home/kcondon/NGS/users/Kenneth/rpackages' # desktop
+
 wd <- paste(getwd(), '/images/', sep = '') # should work on any machine
 ```
 
@@ -149,7 +148,7 @@ tauAnno <- getMart(x = 'mouse', y = 79, z = tauExp)
 head(tauAnno[,1:5], n=5)
 ```
 
-The data frame output now contains all the information required and allows easy user interaction with the following functions.
+The data frame output now contains all the information required for easy user interaction.
 
 # Additional Useful Functions
 
@@ -191,7 +190,9 @@ tissueA <- getTissue('tissueA', qnExp, tauAnno)
 head(tissueA, n = 5)
 ```
 
-The function getTissue retrieves the quantile normalised expression and tissue specificity of every gene in a named tissue. Notice H19 is an absolutely specific gene (ASG, tau 1) and is not expressed  in this tissue (qn 0). Likewise Pbsn is a highly specific gene (HSG, tau 0.911) and is also not expressed in this tissue (qn 0). To identify for which tissues those genes are specific requires the [plotGene](#plotGene) function. However, organising the data like this multiple other useful functions: [plotCorr](#plotCorr), [plotTop](#plotTop), and [getControls](#getControls).
+The function getTissue retrieves the quantile normalised expression and tissue specificity of every gene in a named tissue and uses this information to create a score column. Each gene's score is between 0 and 2, and is the sum of it's tau expression fraction value and it's 0-1 ranged normalised expression value. The gene with both the highest expression and specificity recieves the highest score.
+
+Notice H19 is an absolutely specific gene (ASG, tau 1) and is not expressed  in this tissue (qn 0). Likewise Pbsn is a highly specific gene (HSG, tau 0.911) and is also not expressed in this tissue (qn 0). To identify for which tissues those genes are specific requires the [plotGene](#plotGene) function. However, organising the data like this multiple other useful functions: [plotCorr](#plotCorr), [plotTop](#plotTop), and [getControls](#getControls).
 
 ### Plot correlation between specificity and expression {#plotCorr}
 

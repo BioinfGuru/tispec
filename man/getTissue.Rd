@@ -20,7 +20,10 @@ and specificity values
 \description{
 This function takes a user defined tissue and extracts the ensembl 
 annotations, normalised expression values, tau values, and tau expression
-fractions of all genes in that tissue.
+fractions of all genes in that tissue. Each gene's score is the sum of it's 
+tau expression fraction value and it's 0-1 ranged normalised expression 
+value. The gene with the greatest expression and highest specificity 
+recieves the highest score.
 }
 \examples{
 x <- head(colnames(meanExp), n = 1)

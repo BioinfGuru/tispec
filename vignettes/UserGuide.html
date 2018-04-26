@@ -11,7 +11,7 @@
 
 <meta name="author" content="Kenneth Condon" />
 
-<meta name="date" content="2018-04-24" />
+<meta name="date" content="2018-04-26" />
 
 <title>User Guide</title>
 
@@ -219,7 +219,7 @@ div.tocify {
 
 <h1 class="title toc-ignore">User Guide</h1>
 <h4 class="author"><em>Kenneth Condon</em></h4>
-<h4 class="date"><em>2018-04-24</em></h4>
+<h4 class="date"><em>2018-04-26</em></h4>
 
 </div>
 
@@ -362,7 +362,7 @@ head(meanExp[,1:5], n=5)
 &gt; ENSMUSG00000000028              Cdc45 protein_coding 0.714   0.018   0.458
 &gt; ENSMUSG00000000031                H19        lincRNA 1.000   0.000   0.000
 &gt; ENSMUSG00000000037              Scml2 protein_coding 0.964   0.000   0.000</code></pre>
-<p>The data frame output now contains all the information required and allows easy user interaction with the following functions.</p>
+<p>The data frame output now contains all the information required for easy user interaction.</p>
 </div>
 </div>
 <div id="additional-useful-functions" class="section level1">
@@ -398,13 +398,20 @@ head(hsg, n = 5)
 <h2><span class="header-section-number">3.3</span> Study a tissue of interest</h2>
 <pre class="r"><code>tissueA &lt;- getTissue('tissueA', qnExp, tauAnno)</code></pre>
 <pre class="r"><code>head(tissueA, n = 5)
-&gt;                    external_gene_name   gene_biotype    qn   tau  frac
-&gt; ENSMUSG00000000001              Gnai3 protein_coding 2.824 0.587 0.467
-&gt; ENSMUSG00000000003               Pbsn protein_coding 0.000 0.911 0.000
-&gt; ENSMUSG00000000028              Cdc45 protein_coding 0.030 0.714 0.018
-&gt; ENSMUSG00000000031                H19        lincRNA 0.000 1.000 0.000
-&gt; ENSMUSG00000000037              Scml2 protein_coding 0.000 0.964 0.000</code></pre>
-<p>The function getTissue retrieves the quantile normalised expression and tissue specificity of every gene in a named tissue. Notice H19 is an absolutely specific gene (ASG, tau 1) and is not expressed in this tissue (qn 0). Likewise Pbsn is a highly specific gene (HSG, tau 0.911) and is also not expressed in this tissue (qn 0). To identify for which tissues those genes are specific requires the <a href="#plotGene">plotGene</a> function. However, organising the data like this multiple other useful functions: <a href="#plotCorr">plotCorr</a>, <a href="#plotTop">plotTop</a>, and <a href="#getControls">getControls</a>.</p>
+&gt;                    external_gene_name   gene_biotype   tau  frac    qn
+&gt; ENSMUSG00000000001              Gnai3 protein_coding 0.587 0.467 2.824
+&gt; ENSMUSG00000000003               Pbsn protein_coding 0.911 0.000 0.000
+&gt; ENSMUSG00000000028              Cdc45 protein_coding 0.714 0.018 0.030
+&gt; ENSMUSG00000000031                H19        lincRNA 1.000 0.000 0.000
+&gt; ENSMUSG00000000037              Scml2 protein_coding 0.964 0.000 0.000
+&gt;                    score
+&gt; ENSMUSG00000000001 0.720
+&gt; ENSMUSG00000000003 0.000
+&gt; ENSMUSG00000000028 0.021
+&gt; ENSMUSG00000000031 0.000
+&gt; ENSMUSG00000000037 0.000</code></pre>
+<p>The function getTissue retrieves the quantile normalised expression and tissue specificity of every gene in a named tissue and uses this information to create a score column. Each gene’s score is between 0 and 2, and is the sum of it’s tau expression fraction value and it’s 0-1 ranged normalised expression value. The gene with both the highest expression and specificity recieves the highest score.</p>
+<p>Notice H19 is an absolutely specific gene (ASG, tau 1) and is not expressed in this tissue (qn 0). Likewise Pbsn is a highly specific gene (HSG, tau 0.911) and is also not expressed in this tissue (qn 0). To identify for which tissues those genes are specific requires the <a href="#plotGene">plotGene</a> function. However, organising the data like this multiple other useful functions: <a href="#plotCorr">plotCorr</a>, <a href="#plotTop">plotTop</a>, and <a href="#getControls">getControls</a>.</p>
 <div id="plotCorr" class="section level3">
 <h3><span class="header-section-number">3.3.1</span> Plot correlation between specificity and expression</h3>
 <pre class="r"><code>corrPlots &lt;- plotCorr(tissueA)
@@ -426,12 +433,18 @@ corrPlots$local</code></pre>
 <h3><span class="header-section-number">3.3.3</span> Get a set of control genes</h3>
 <pre class="r"><code>controls &lt;- getControls(tissueA, tissueB)
 head(controls$tissueA, n = 5)
-&gt;                    external_gene_name   gene_biotype    qn   tau  frac
-&gt; ENSMUSG00000043157              Arl11 protein_coding 9.970 1.000 1.000
-&gt; ENSMUSG00000044991      1110034G24Rik protein_coding 9.722 0.979 0.979
-&gt; ENSMUSG00000027481             Bpifb2 protein_coding 9.099 0.986 0.986
-&gt; ENSMUSG00000030846              Tial1 protein_coding 8.972 1.000 1.000
-&gt; ENSMUSG00000048806              Ifnb1 protein_coding 8.393 0.979 0.979</code></pre>
+&gt;                    external_gene_name   gene_biotype   tau  frac    qn
+&gt; ENSMUSG00000043157              Arl11 protein_coding 1.000 1.000 9.970
+&gt; ENSMUSG00000044991      1110034G24Rik protein_coding 0.979 0.979 9.722
+&gt; ENSMUSG00000027481             Bpifb2 protein_coding 0.986 0.986 9.099
+&gt; ENSMUSG00000030846              Tial1 protein_coding 1.000 1.000 8.972
+&gt; ENSMUSG00000048806              Ifnb1 protein_coding 0.979 0.979 8.393
+&gt;                    score
+&gt; ENSMUSG00000043157 1.892
+&gt; ENSMUSG00000044991 1.849
+&gt; ENSMUSG00000027481 1.800
+&gt; ENSMUSG00000030846 1.803
+&gt; ENSMUSG00000048806 1.730</code></pre>
 <p>The genes listed are either highly or absolutely specific for tissueA, with quantile normalised expression less than 0.1 in tissue B. This is useful for getting a set of control genes to differentiate between two tissues.</p>
 </div>
 </div>
