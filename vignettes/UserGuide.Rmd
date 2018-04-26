@@ -221,23 +221,25 @@ meanExp[c(rownames(optimum$dataframe)),]
 
 ### Plot correlation between specificity and expression {#plotCorr}
 
+Visualising the relationship between specificity and correlation in a tissue helps us conceptualise the nature of tissue specific genes in a tissue. Also, with this function a gene of interest can be highlighted to see how it compares to the rest of the genes in the tissue in terms of expression and specificity.
+
 ```{r, eval=FALSE}
-corrPlots <- plotCorr(tissueA)
-corrPlots$global
-corrPlots$local
+corrPlots <- plotCorr(tissueA, c('Col4a3', 'Ifnb1'))
+corrPlots$tauPlot
+corrPlots$fracPlot
 ```
 
 ```{r, echo=FALSE}
-include_graphics(paste(wd,'corrglobal.png',sep = ''))
+include_graphics(paste(wd,'tauPlot.png',sep = ''))
 ```
 
-There is a negative correlation (r = -0.59) as reflected in the trendline. As the specificity of a gene **for ANY tissue** increases, the expression of the gene in tissueA decreases. However, many tissueA absolutely specific genes (orange) still have relatively high expression.
+By plotting the tau value against expression we see that as the specificity of a gene **for ANY tissue** increases, the expression of the gene in tissueA decreases. There is a negative correlation (r = -0.59) as reflected in the trendline. However, many tissueA absolutely specific genes (orange) still have relatively high expression in tissueA. We also see how genes of interest passed by the user are highlighted (pink): both are highly expressed and highly specific, although from this plot it is not known for which tissue they are specific because only the tau value was used.
 
 ```{r, echo=FALSE}
-include_graphics(paste(wd,'corrlocal.png',sep = ''))
+include_graphics(paste(wd,'fracPlot.png',sep = ''))
 ```
 
-There is a positive correlation (r = 0.55). However, the trendline shows an initial strong positive correlation that plateaus from 0.1 specificity (frac). As specificity of a gene **for tissueA** increases above 0.1, there is little effect on expression. This is clearly shown by the wide range of expression of genes that are absolutely specific (orange) or highly specific (yellow) for tissueA. To get genes that are both highly specific and highly expressed use [getOptimum](#getOptimum).
+By plotting the tau expression value against expression we see that as specificity of a gene **for tissueA** increases above 0.1, there is actually little effect on expression. There is a positive correlation (r = 0.55). However, the trendline shows an initial strong positive correlation that plateaus above 0.1 specificity (frac). This is clearly shown by the wide range of expression of genes that are absolutely specific (orange) or highly specific (yellow) for tissueA. From this plot we can confirm that both genes passed by the user are highly expressed and highly specific to tissueA because the tau expression fraction was used. To extract genes that are both highly specific and highly expressed use [getOptimum](#getOptimum). Try passing the results of getOptimum to this function: in what area of the scatter plot do you think those genes will be? 
 
 ### Get a set of control genes {#getControls}
 

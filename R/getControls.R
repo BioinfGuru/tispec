@@ -2,8 +2,9 @@
 #' @title Get a set of genes that can be used to differentiate between 2 tissues
 #' @description
 #' This function selects 2 set of genes, 1 for each tissue. Each set includes 
-#' genes that are highly specific and expressed in one tissue with <0.1 quantile normalised expression in the other. This is useful for choosing 
-#' differentiating between tissue types. For example, for selecting positive + 
+#' genes that are highly specific and expressed in one tissue with <0.1 
+#' quantile normalised expression in the other. This is useful for 
+#' differentiating between tissue types. For example, for selecting positive & 
 #' negative controls for qPCR to determine if a tissue sample has been 
 #' contaminated.
 #' @param x primary tissue, output from getTissue()
