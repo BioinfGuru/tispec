@@ -137,7 +137,7 @@ head(tauExp[,1:5], n=5)
 
 The output of 'calcTau' now begins with an extra column containing the tau value of each gene, while each tissue column is now populated with tau expression fractions. 
 
-## Biomart Annotation
+## Biomart Annotation {#getMart}
 
 Next, using the biomaRt package, the gene name and type are added to each ensembl gene ID.
 
@@ -154,13 +154,11 @@ The data frame output now contains all the information required for easy user in
 
 ## Specific gene distribution
 
-```{r, eval=FALSE}
+```{r, eval=TRUE, echo=TRUE}
 plotDensity(tauAnno) 
 ```
 
-```{r, echo = FALSE}
-include_graphics(paste(wd,'density.png',sep = ''))
-```
+Notice the similarity between the shape of this plot andTau plotted in Figure 1 with a peak at tau>0.95. The plots are not highly similar because here a much reduced dataset is plotted (~9k genes only). Expect a distribution similar to Figure 1 when all annotated genes are included (~40k genes).
 
 ## Specific gene counts
 
@@ -172,13 +170,11 @@ hsg <- getDist(tauAnno, 0.85)
 head(hsg, n = 5)
 ```
 
-```{r, eval=FALSE}
+```{r, eval=TRUE, echo=TRUE}
 plotDist(tauAnno)
 ```
 
-```{r, echo = FALSE}
-include_graphics(paste(wd,'dist.png',sep = ''))
-```
+The distribution plot identifies tissueM and tissueO as the tissues with the highest number of absolutely specific genes (ASGs, tau = 1) and highly tissue specific genes (HSGs, tau >= 0.85)
 
 ## Study a tissue of interest
 
@@ -194,26 +190,20 @@ head(tissueA[, -2], n = 5)
 
 The function getTissue retrieves the quantile normalised expression and tissue specificity of every gene in a named tissue and uses this information to create a score column. Each gene's score is between 0 and 2, and is the sum of it's tau expression fraction value and it's 0-1 ranged normalised expression value. The gene with both the highest expression and specificity recieves the highest score.
 
-Notice H19 is an absolutely specific gene (ASG, tau 1) and is not expressed  in this tissue (qn 0). Likewise Pbsn is a highly specific gene (HSG, tau 0.911) and is also not expressed in this tissue (qn 0). To identify for which tissues those genes are specific requires the [plotGene](#plotGene) function. However, organising the data like this multiple other useful functions: [getOptimum](#getOptimum), [plotCorr](#plotCorr), and [getControls](#getControls).
+Notice Scml2 is a highly specific gene (tau 0.964) but not for tissueA (frac 0.000) and is not even expressed in tissueA (qn 0.000). To identify for which tissue Scml2 is specific requires the [plotGene](#plotGene) function. However, organising the data like this allows multiple other useful functions: [getOptimum](#getOptimum), [plotCorr](#plotCorr), and [getControls](#getControls).
 
 ### Get a highly specific, highly expressed, optimal gene set {#getOptimum}
 
-Ranking of genes by both expression and specificity is useful for anyone working on a single tissue wanting to identify a set of genes 1) that are highly specific to the tissue, 2) that are expressed in high enough quantities to facilitate bench work in the laboratory, and 3) with minimal expression in other tissues to reduce risk of off target effects:
+Ranking of genes by both expression and specificity is useful for anyone working on a single tissue wanting to identify a set of genes 1) that are highly specific to the tissue, 2) that are expressed in high enough quantities (facilitates bench work in the laboratory), and 3) with minimal expression in other tissues (limits off target effects)
 
 ```{r}
 optimum <- getOptimum(tauAnno, tissueA, 5)
 optimum$dataframe[, -2]
-```
 
-```{r, eval = FALSE}
 optimum$barplot
 ```
 
-```{r, echo = FALSE}
-include_graphics(paste(wd,'optimum.png',sep = ''))
-```
-
-The plot shows the top 5 optimal genes for tissue A. Arl11 and Tial1 are absolutely specific with high expression, while the other 3 genes are still highly specific for tissue A but their expression in other tissues is minimal. The plot shows all other tissues in which those genes are expressed so as to facilitate prediction of potential off target affect of any biological experiments (e.g. CRISPR). To confirm these findings simply extract the expression values of these genes from the input data. Notice the high expression in tissueA, and minimal expression elsewhere.
+The plot shows the top 5 optimal genes for tissueA. Tial1 is absolutely specific for tissueA (frac 1.000) while Col4a3 is highly specific for tissueA (frac 0.943). Both genes are highly expressed in tissueA but their expression in other tissues is minimal (Use [plotGene](#plotGene) to confirm). The plot shows all other tissues in which those genes are expressed so as to facilitate prediction of potential off target affect of any biological experiments (e.g. CRISPR). To confirm these findings simply extract the expression values of these genes from the input data. Notice the high expression in tissueA, and minimal expression elsewhere.
 
 ```{r}
 meanExp[c(rownames(optimum$dataframe)),]
@@ -223,27 +213,22 @@ meanExp[c(rownames(optimum$dataframe)),]
 
 Visualising the relationship between specificity and correlation in a tissue helps us conceptualise the nature of tissue specific genes in a tissue. Also, with this function a gene of interest can be highlighted to see how it compares to the rest of the genes in the tissue in terms of expression and specificity.
 
-```{r, eval=FALSE}
-corrPlots <- plotCorr(tissueA, c('Col4a3', 'Ifnb1'))
+```{r, eval=TRUE, echo=TRUE, message=FALSE}
+corrPlots <- plotCorr(tissueA, c('Col4a3', 'Mboat7'))
 corrPlots$tauPlot
+```
+
+By plotting the tau value against expression we see that as the specificity of a gene **for ANY tissue** increases, the expression of the gene in tissueA decreases. There is a negative correlation (r = -0.58) as reflected in the trendline. However, many tissueA absolutely specific genes (orange) still have relatively high expression in tissueA. We also see how genes of interest passed by the user are highlighted (pink): both are highly expressed and highly specific, although from this plot it is not known for which tissue they are specific because only the tau value was used.
+
+```{r, eval=TRUE, echo=TRUE}
 corrPlots$fracPlot
 ```
 
-```{r, echo=FALSE}
-include_graphics(paste(wd,'tauPlot.png',sep = ''))
-```
-
-By plotting the tau value against expression we see that as the specificity of a gene **for ANY tissue** increases, the expression of the gene in tissueA decreases. There is a negative correlation (r = -0.59) as reflected in the trendline. However, many tissueA absolutely specific genes (orange) still have relatively high expression in tissueA. We also see how genes of interest passed by the user are highlighted (pink): both are highly expressed and highly specific, although from this plot it is not known for which tissue they are specific because only the tau value was used.
-
-```{r, echo=FALSE}
-include_graphics(paste(wd,'fracPlot.png',sep = ''))
-```
-
-By plotting the tau expression value against expression we see that as specificity of a gene **for tissueA** increases above 0.1, there is actually little effect on expression. There is a positive correlation (r = 0.55). However, the trendline shows an initial strong positive correlation that plateaus above 0.1 specificity (frac). This is clearly shown by the wide range of expression of genes that are absolutely specific (orange) or highly specific (yellow) for tissueA. From this plot we can confirm that both genes passed by the user are highly expressed and highly specific to tissueA because the tau expression fraction was used. To extract genes that are both highly specific and highly expressed use [getOptimum](#getOptimum). Try passing the results of getOptimum to this function: in what area of the scatter plot do you think those genes will be? 
+By plotting the tau expression value against expression we see that as specificity of a gene **for tissueA** increases above 0.1, there is actually little effect on expression in tissueA. There is a positive correlation (r = 0.52). However, the trendline shows an initial strong positive correlation that plateaus above 0.1 specificity (frac). This is clearly shown by the wide range of expression of genes that are absolutely specific (orange) or highly specific (yellow) for tissueA. From this plot we can now see that of both genes passed by the user, only Col4a3 is highly specific to tissueA because the tau expression fractions for tissueA were used. To extract genes that are both highly specific and highly expressed use [getOptimum](#getOptimum). Try passing the results of getOptimum to this function: in what area of the scatter plot do you think those genes will be plotted? 
 
 ### Get a set of control genes {#getControls}
 
-This function is useful for differentiating between two tissues. For example, to determine if a small sample of suprachiasmtic nucleus brain tissue has been contaminated with cortex brain tissue during tissue dissection. Performing qPCR on the top ranked genes returned by the function will confirm the presence/absence of the contaminant.
+This function is useful for differentiating between two tissues. For example, to determine if a small sample of suprachiasmtic nucleus brain tissue has been contaminated with cortex brain tissue during tissue dissection. Performing qPCR on the top ranked genes returned by the function will confirm/reject contamination.
 
 ```{r}
 controls <- getControls(tissueA, tissueB)
@@ -253,20 +238,25 @@ head(controls$tissueA[, -2], n = 1)
 head(controls$tissueB[, -2], n = 1)
 ```
 
-In the example shown, we are trying to determine if tissueA has been contaminated with tissueB. The 2 top ranked genes returned are specific for, and highly expressed in, their respective tissue but also have less than 0.1 quantile normalised expression in the other tissue. So performing qPCR on tissueA to identify the amount of Arl11 (positive control) and Mboat7 (negative control), will confirm if contamination of tissueA with tissueB has occured.
+In the example shown, we are trying to determine if tissueA has been contaminated with tissueB. The 2 top ranked genes returned are specific for, and highly expressed in, their respective tissue but also have less than 0.1 quantile normalised expression in the other tissue. So performing qPCR on tissueA to identify the amount of Arl11 (positive control) and Mboat7 (negative control), will confirm if tissueA has been contaminated with tissueB.
 
 ## Study a gene of interest {#plotGene}
 
-```{r}
-subset(tauAnno, tauAnno$external_gene_name == 'Gnai3') # gene name is case sensitive
+Quite often a researcher works on a specific gene rather than a tissue and may find this function useful to identify the specificity of a single gene for any and all tissues. This function can also be used to confirm the results from other functions in this package e.g.  [getOptimum](#getOptimum).
+
+```{r, eval=TRUE, echo=TRUE}
+plotGene(tauAnno, 'Mboat7') # gene name is case sensitive
 ```
 
-```{r, eval=FALSE}
-plotGene(tauAnno, 'Gnai3')
+This function is simply plotting the gene from the result of [getMart](#getMart):
+
+```{r, eval=TRUE, echo=TRUE}
+subset(tauAnno, tauAnno$external_gene_name == 'Mboat7')
 ```
 
-```{r, echo = FALSE}
-include_graphics(paste(wd,'gene.png',sep = ''))
+Viewing the input expression values of the gene confirms the plot output:
+
+```{r, eval=TRUE, echo=TRUE}
+id <- rownames(subset(tauAnno, tauAnno$external_gene_name == 'Mboat7'))
+round(meanExp[id, ], digits = 3)
 ```
-
-

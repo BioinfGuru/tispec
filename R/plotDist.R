@@ -31,8 +31,8 @@ plotDist <- function(x){
     ggplot2::ggplot(dist, ggplot2::aes_string(x = 'tissues', y = 'count', fill = 'spec'))+
         ggplot2::geom_bar(position = "dodge",stat = "identity",colour = "black")+
         ggplot2::geom_text(ggplot2::aes_string(label = 'count'), size = 3, vjust = -1, position = ggplot2::position_dodge(width = 1))+
-        ggplot2::labs(title = "Distribution of Highly (HSG) and Absolutely (ASG) Specific Genes") +
-        ggplot2::scale_y_continuous(name = "Number of Genes", limits = c(0,2000), breaks = round(seq(min(0), max(2000), by = 100),1))+
+        ggplot2::labs(title = "Distribution") +
+        ggplot2::scale_y_continuous(name = "Number of Genes", limits = c(0,2000), breaks = round(seq(min(0), max(2000), by = 200),1))+
         ggplot2::scale_fill_manual(values = c("#0072B2", "#009E73"), name = "")+
         ggplot2::theme_bw()+
         ggplot2::theme(
