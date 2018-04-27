@@ -24,7 +24,6 @@
 #' optimum$barplot
 #' @import tidyverse
 #' @export
-
 getOptimum <- function(x, y, z){
     
     # ranking
@@ -34,15 +33,15 @@ getOptimum <- function(x, y, z){
     y <- y[y$frac >= 0.85, ]
     top <- utils::head(y, n = z)
     
-    # add all tissues
-    topAllTissues <- x[x$external_gene_name %in% top$external_gene_name, c(-1, -2, -3)]
-    topAllTissues <- topAllTissues[, colSums(topAllTissues) != 0]
-    topAllTissues <- merge(top, topAllTissues, by = "row.names")
-    topAllTissues <- topAllTissues[,c(-1, -3, -4, -5, -6, -7)]
-    topAllTissues <- tidyr::gather(topAllTissues, 'tissue', 'frac', -'external_gene_name')
+    # add the other tissues
+    temp <- x[rownames(top), c(-1, -2, -3)]
+    temp <- temp[, colSums(temp) != 0]
+    temp <- cbind(top, temp)
+    temp <- temp[, -c(2:6)]
+    temp <- tidyr::gather(temp, 'tissue', 'frac', -'external_gene_name')
     
     # plot
-    plot <- ggplot2::ggplot(topAllTissues, ggplot2::aes_(x = quote(tissue), y = quote(frac), fill = quote(external_gene_name)))+
+    plot <- ggplot2::ggplot(temp, ggplot2::aes_(x = quote(tissue), y = quote(frac), fill = quote(external_gene_name)))+
         ggplot2::geom_bar(position = "dodge",stat = "identity",colour = "black", width = 0.5)+
         ggplot2::geom_hline(ggplot2::aes(yintercept = 0.85), linetype = "dotted", colour = "red")+
         ggplot2::labs(title = paste('Optimum Gene Set', sep = ""))+

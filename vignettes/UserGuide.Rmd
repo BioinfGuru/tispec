@@ -203,7 +203,9 @@ optimum$dataframe[, -2]
 optimum$barplot
 ```
 
-The plot shows the top 5 optimal genes for tissueA. Tial1 is absolutely specific for tissueA (frac 1.000) while Col4a3 is highly specific for tissueA (frac 0.943). Both genes are highly expressed in tissueA but their expression in other tissues is minimal (Use [plotGene](#plotGene) to confirm). The plot shows all other tissues in which those genes are expressed so as to facilitate prediction of potential off target affect of any biological experiments (e.g. CRISPR). To confirm these findings simply extract the expression values of these genes from the input data. Notice the high expression in tissueA, and minimal expression elsewhere.
+The plot shows the top 10 optimal genes for tissueA, and their specificity for only the tissues in which they are expressed. Tial1 is absolutely specific for tissueA (frac 1.000) while Col4a3 is highly specific for tissueA (frac 0.943). Both genes are highly expressed in tissueA, but Col4a3 is also minimally expressed in tissueI (Use [plotGene](#plotGene) to confirm). The plot shows all other tissues in which those genes are expressed so as to facilitate prediction of potential off target affect of any biological experiments (e.g. CRISPR).
+
+Extract the gene expression values to see the high expression in tissueA, and minimal expression elsewhere:
 
 ```{r}
 meanExp[c(rownames(optimum$dataframe)),]
