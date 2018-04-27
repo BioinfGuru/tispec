@@ -1,17 +1,18 @@
 #' @name getControls
 #' @title Get a set of genes that can be used to differentiate between 2 tissues
 #' @description
-#' This function selects 2 set of genes, 1 for each tissue. Each set includes 
+#' This function selects 2 lists of genes, 1 for each tissue. Each list includes 
 #' genes that are highly specific and expressed in one tissue with <0.1 
 #' quantile normalised expression in the other. This is useful for 
 #' differentiating between tissue types. For example, for selecting positive & 
 #' negative controls for qPCR to determine if a tissue sample has been 
-#' contaminated.
+#' contaminated. 
 #' @param x primary tissue, output from getTissue()
 #' @param y secondary tissue, output from getTissue()
 #' @return
 #' Returns a list object containing 1 dataframe of genes for each of the 2 
-#' tissues.
+#' tissues. The data frames are ranked first by score and then by quantile 
+#' normalised expression
 #' @examples
 #' # Usage
 #' controls <- getControls(tissueA, tissueB)
@@ -24,20 +25,24 @@
 
 getControls <-function(x, y){
     
-    ## get primary highly specific genes with low expression in secondary
-    primary <- x[x$frac >= 0.85,]
-    primary <- primary[!row.names(primary) %in% row.names(subset(y, y$qn >= 0.1)),]
-    primary <- primary[order(-primary$qn),]
+    # primary
+    namex <-deparse(substitute(x))
+    x <- x[x$frac >= 0.85, ]
+    x <- x[!row.names(x) %in% row.names(subset(y, y$qn >= 0.1)),]
+    x$score <- as.numeric(as.character(x$score))
+    x$frac <- as.numeric(as.character(x$frac))
+    primary <- x[order(-x$score, -x$frac), ]
     
-    ## get secondary highly specific genes with low expression in primary
-    secondary <- y[y$frac >= 0.85,]
-    secondary <- secondary[!row.names(secondary) %in% row.names(subset(x, x$qn >= 0.1)),]
-    secondary <- secondary[order(-secondary$qn),]
+    # secondary
+    namey <-deparse(substitute(y))
+    y <- y[y$frac >= 0.85, ]
+    y <- y[!row.names(y) %in% row.names(subset(x, x$qn >= 0.1)),]
+    y$score <- as.numeric(as.character(y$score))
+    y$frac <- as.numeric(as.character(y$frac))
+    secondary <- y[order(-y$score, -y$frac), ]
     
     ## return a list of objects
     results <- list(primary = primary, secondary = secondary)
-    namex <-deparse(substitute(x))
-    namey <-deparse(substitute(y))
     names(results) <- c(namex, namey)
     return(results)
 }

@@ -13,10 +13,11 @@ getControls(x, y)
 }
 \value{
 Returns a list object containing 1 dataframe of genes for each of the 2 
-tissues.
+tissues. The data frames are ranked first by score and then by quantile 
+normalised expression
 }
 \description{
-This function selects 2 set of genes, 1 for each tissue. Each set includes 
+This function selects 2 lists of genes, 1 for each tissue. Each list includes 
 genes that are highly specific and expressed in one tissue with <0.1 
 quantile normalised expression in the other. This is useful for 
 differentiating between tissue types. For example, for selecting positive & 

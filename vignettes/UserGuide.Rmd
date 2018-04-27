@@ -189,7 +189,7 @@ tissueA <- getTissue('tissueA', qnExp, tauAnno)
 ```
 
 ```{r}
-head(tissueA, n = 5)
+head(tissueA[, -2], n = 5)
 ```
 
 The function getTissue retrieves the quantile normalised expression and tissue specificity of every gene in a named tissue and uses this information to create a score column. Each gene's score is between 0 and 2, and is the sum of it's tau expression fraction value and it's 0-1 ranged normalised expression value. The gene with both the highest expression and specificity recieves the highest score.
@@ -202,7 +202,7 @@ Ranking of genes by both expression and specificity is useful for anyone working
 
 ```{r}
 optimum <- getOptimum(tauAnno, tissueA, 5)
-optimum$dataframe
+optimum$dataframe[, -2]
 ```
 
 ```{r, eval = FALSE}
@@ -243,12 +243,17 @@ By plotting the tau expression value against expression we see that as specifici
 
 ### Get a set of control genes {#getControls}
 
+This function is useful for differentiating between two tissues. For example, to determine if a small sample of suprachiasmtic nucleus brain tissue has been contaminated with cortex brain tissue during tissue dissection. Performing qPCR on the top ranked genes returned by the function will confirm the presence/absence of the contaminant.
+
 ```{r}
 controls <- getControls(tissueA, tissueB)
-head(controls$tissueA, n = 5)
+
+head(controls$tissueA[, -2], n = 1)
+
+head(controls$tissueB[, -2], n = 1)
 ```
 
-The genes listed are either highly or absolutely specific for tissueA, with quantile normalised expression less than 0.1 in tissue B. This is useful for getting a set of control genes to differentiate between two tissues.
+In the example shown, we are trying to determine if tissueA has been contaminated with tissueB. The 2 top ranked genes returned are specific for, and highly expressed in, their respective tissue but also have less than 0.1 quantile normalised expression in the other tissue. So performing qPCR on tissueA to identify the amount of Arl11 (positive control) and Mboat7 (negative control), will confirm if contamination of tissueA with tissueB has occured.
 
 ## Study a gene of interest {#plotGene}
 
