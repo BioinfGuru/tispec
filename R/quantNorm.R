@@ -26,7 +26,7 @@ quantNorm <- function(x){
     x <- round(preprocessCore::normalize.quantiles(x_m), digits = 3)
     x[is.na(x)] <- 0
     x <-data.frame(x)
-    names(x)[c(1:length(x.cols))] <- x.cols
-    row.names(x)[c(1:length(x.rows))] <- x.rows
+    names(x)[c(seq_along(x.cols))] <- x.cols
+    row.names(x)[c(seq_along(x.rows))] <- x.rows
     return(x)
 }
