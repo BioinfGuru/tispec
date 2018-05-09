@@ -10,8 +10,8 @@ plotGene(x, y)
 \item{x}{ensembl annotated tau expression fraction file 
 i.e. output from getMart()}
 
-\item{y}{user define gene, case dependent, to see gene available names 
-view output of getMart()}
+\item{y}{user defined gene, case sensitive, to see gene names available view 
+the output of getMart()}
 }
 \value{
 Returns a bar plot of tau espression fraction in each tissue

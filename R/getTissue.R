@@ -25,6 +25,7 @@
 getTissue <- function(x, y, z){
     y <- y[order(rownames(y)),]
     z <- z[order(rownames(z)),]
+    if(!x %in% colnames(z)){stop('Check the tissue name you provided', call. = FALSE)}
     df <- z[,c("external_gene_name", "gene_biotype", "tau", x)]
     df <- cbind(df, y[x])
     colnames(df)[c(4,5)] <- c('frac', 'qn')

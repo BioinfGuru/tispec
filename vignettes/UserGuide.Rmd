@@ -93,11 +93,15 @@ Users run their preferred RNA-seq analysis pipeline to calculate a single expres
 ```{r}
 library(tispec)
 head(meanExp[,1:5], n=5)
+
+checkInput(meanExp[,1:5])
 ```
+
+The checkInput function evaluates the cells of the dataframe to ensure it is in the correct format i.e.  The function returns errors when it finds cells that contain character strings, NAs, negative values or infinite values. In the example above, only the first five tissues are checked. The number of incorrectly formatted cells are returned for each tissue.
 
 ## Normalisation
 
-For each tissue independently, the input data should be normalised so that differences in expression between 1 gene and another within the tissue can be compared while reducing the effect of outliers on the output. A pseudo count is added to log2 transform the data, and a threshold of log2(0) is set. This means that all genes with input values below 1.0 will be defined as non-expressed. All genes not expressed in any tissue are then removed from the data. Finally, to allow comparison of gene expression across different tissues that may come from different experiments/laboratories, the log2 transformed data frame is quantile normalised which makes the distribution of data in each tissue statistically identical to each other. Remember, now the expression values are on a log scale, so +1 difference represents a 10x difference in expression.  
+For each tissue independently, the input data should be normalised so that differences in expression between 1 gene and another within the tissue can be compared while reducing the effect of outliers on the output. A pseudo count is added to log2 transform the data, and a threshold of log2(0) is set. This means that all genes with input values below 1.0 will be defined as non-expressed. All genes not expressed in any tissue are then removed from the data. Finally, to allow comparison of gene expression across different tissues that may come from different experiments/laboratories, the log2 transformed dataframe is quantile normalised which makes the distribution of data in each tissue statistically identical to each other. Remember, now the expression values are on a log scale, so +1 difference represents a 10x difference in expression.  
 
 ```{r, eval=FALSE}
 log2Exp <- log2Tran(meanExp) 
@@ -148,7 +152,7 @@ tauAnno <- getMart(x = 'mouse', y = 79, z = tauExp)
 head(tauAnno[,1:5], n=5)
 ```
 
-The data frame output now contains all the information required for easy user interaction.
+The dataframe output now contains all the information required for easy user interaction.
 
 # Additional Useful Functions
 

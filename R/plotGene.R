@@ -7,8 +7,8 @@
 #' enriched/depleted expression
 #' @param x ensembl annotated tau expression fraction file 
 #' i.e. output from getMart()
-#' @param y user define gene, case dependent, to see gene available names 
-#' view output of getMart()
+#' @param y user defined gene, case sensitive, to see gene names available view 
+#' the output of getMart()
 #' @return
 #' Returns a bar plot of tau espression fraction in each tissue
 #' @examples
@@ -22,13 +22,11 @@
 #' @export
 
 plotGene <- function(x, y){
+    if (!y %in% x$external_gene_name){stop('The gene name you entered is not present. Please check it. Gene names are case sensitive.', call. = FALSE)}
     geneFrac <- data.frame(t(subset(x[,c(-1, -2, -3)], x$external_gene_name == y)))
     geneFrac[,1] <- round(geneFrac[,1], digits = 2)
     geneID <- colnames(geneFrac)
     geneTau <- x[colnames(geneFrac), "tau"]
-    if (!y %in% x$external_gene_name){
-        stop(paste(y, ' : ', geneID, ' : Gene not found, check expression', sep = ''))
-    }
     colnames(geneFrac)[1] <- 'tauExpFrac'
     ggplot2::ggplot(geneFrac, ggplot2::aes_(x = rownames(geneFrac), y = quote(tauExpFrac), fill = quote(tauExpFrac)))+
         ggplot2::geom_bar(position = "dodge",stat = "identity",colour = "black")+
