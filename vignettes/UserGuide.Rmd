@@ -51,7 +51,7 @@ Using both human and mouse RNA-seq data, the benchmark paper compared 9 algorith
 
 * Raw counts 
 * Tau^[Yanai, I., Benjamin, H., Shmoish, M., Chalifa-Caspi, V., Shklar, M., Ophir, R., Bar-Even, A., Horn-Saban, S., Safran, M., Domany, E., Lancet, D., Shmueli, O., 2005. Genome-wide midrange transcription profiles reveal expression level relationships in human tissue specification. Bioinformatics (Oxford, England). 21, 650-659.]
-* Gini coefficient (adapted from economics theory)
+* Gini coefficient^[Lidia Ceriani & Paolo Verme, 2012. "The origins of the Gini index: extracts from Variabilità e Mutabilità (1912) by Corrado Gini," The Journal of Economic Inequality, Springer;Society for the Study of Economic Inequality, vol. 10(3), pages 421-443, September.]
 * Tissue specificity index (TSI)^[Julien, P., Brawand, D., Soumillon, M., Necsulea, A., Liechti, A., Schutz, F., Daish, T., Grutzner, F., Kaessmann, H., 2012. Mechanisms and evolutionary patterns of mammalian and avian dosage compensation. PLoS Biology. 10, e1001328.]
 * Shannon entropy (Hg)^[Schug, J., Schuller, W.P., Kappen, C., Salbaum, J.M., Bucan, M., Stoeckert, C.J.,Jr, 2005. Promoter features related to tissue specificity as measured by Shannon entropy. Genome Biology. 6, R33.]
 * Z-score^[Vandenbon, A. &  Nakai, K., 2010. Modeling tissue-specific structural patterns in human and mouse promoters. Nucleic Acids Research. 38, 17-25.]
@@ -59,7 +59,7 @@ Using both human and mouse RNA-seq data, the benchmark paper compared 9 algorith
 * Expression enrichment (EE)^[Yu, X., Lin, J., Zack, D.J., Qian, J., 2006. Computational analysis of tissue-specific combinatorial gene regulation: predicting interaction between transcription factors in human tissues. Nucleic Acids Research. 34, 4925-4936.]
 * Preferential expression measure (PEM)^[Huminiecki, L., Lloyd, A.T., Wolfe, K.H., 2003. Congruence of tissue expression profiles from Gene Expression Atlas, SAGEmap and TissueInfo databases. BMC Genomics. 4, 31.]. 
 
-The benchmarking results (fig. 1) show that every algorithm produces a bimodal distribution identifying 3 clear groups: 
+The results of the benchmark paper (fig. 1) show that every algorithm produces a bimodal distribution identifying 3 clear groups: 
 
 * 0-0.2 tissue specificity (non/low specificity, housekeeping genes)
 * 0.2-0.8 tissue specificity (intermediate specificity)
@@ -67,7 +67,7 @@ The benchmarking results (fig. 1) show that every algorithm produces a bimodal d
 
 The authors identified the best performing algorithms as tau, gini and counts. However the authors state that counts is only robust if the correct expression threshold/cut-off is chosen and gini doesn’t normalise for expression amplitude between tissues, while tau normalises for amplitude between tissues and also includes the number of tissues as part of the algorithm.
 
-```{r, echo = FALSE, fig.cap = "Figure 1: Distribution of tissue specificity by algorithm used."}
+```{r, echo = FALSE, fig.cap = "Figure 1: Distribution of tissue specificity by algorithm taken from the 2016 benchmark paper"}
 include_graphics(paste(wd,'benchmark.png',sep = ''))
 ```
 
@@ -85,6 +85,8 @@ The key conclusions of the benchmark were as follows:
 ```{r, echo = FALSE, fig.cap = "Figure 2: Calculating tissue specificity"}
 include_graphics(paste(wd,'workflow.png',sep = ''))
 ```
+
+The workflow (fig. 1) first log transforms the expression values provided by the user. To make cross-tissue comparisons possible, quantile normalizing is performed on the entire dataframe, after which each gene is given a bin value between 0-10 for each tissue. The higher the bin value, the greater the expression. The list of bin values of a gene is then passed to the TAU algorithm to calculate it's specificity for any tissue. Finally, the specificity of each gene for each individual tissue is calculated (Tau Expression Fraction).
 
 ## Input
 

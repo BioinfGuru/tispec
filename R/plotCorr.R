@@ -28,7 +28,7 @@
 #' @examples
 #' # Choose Input
 #' corrPlots <- plotCorr(tissueA) # without user genes of interest
-#' corrPlots <- plotCorr(tissueA, c('Col4a3', 'Ifnb1')) # vector of genes
+#' corrPlots <- plotCorr(tissueA, c('Col4a3', 'Mboat7')) # vector of genes
 #' corrPlots <- plotCorr(tissueA, optimum$dataframe$external_gene_name) # output from getOptimum
 #' 
 #' # View results
@@ -55,7 +55,7 @@ plotCorr <- function(x,y){
             ggplot2::guides(fill = FALSE)+
             ggplot2::annotate("text", x = 0.95, y = 14, label = corEst, size = 6)+
             ggplot2::xlab('Specificity (tau)')+
-            ggplot2::ylab('QN Expression')+
+            ggplot2::ylab('Expression')+
             ggplot2::scale_x_continuous(limits = c(0,1), breaks = round(seq(min(0), max(1), by = 0.2), 1))+
             ggplot2::scale_y_continuous(limits = c(0,14), breaks = round(seq(min(0), max(14), by = 2), 1))+
             ggplot2::stat_smooth(method = 'auto', level = 0.99, colour = "red", linetype = "dashed", size = 1, na.rm = TRUE)+
@@ -85,7 +85,7 @@ plotCorr <- function(x,y){
             ggplot2::guides(fill = FALSE)+
             ggplot2::annotate("text", x = 0.95, y = 14, label = corEst, size = 6)+
             ggplot2::xlab('Specificity (frac)')+
-            ggplot2::ylab('QN Expression')+
+            ggplot2::ylab('Expression')+
             ggplot2::scale_x_continuous(limits = c(0,1), breaks = round(seq(min(0), max(1), by = 0.2), 1))+
             ggplot2::scale_y_continuous(limits = c(0,14), breaks = round(seq(min(0), max(14), by = 2), 1))+
             ggplot2::stat_smooth(method = 'auto', level = 0.99, colour = "red", linetype = "dashed", size = 1, na.rm = TRUE)+
@@ -126,7 +126,7 @@ plotCorr <- function(x,y){
             ggplot2::guides(fill = FALSE)+
             ggplot2::annotate("text", x = 0.95, y = 14, label = corEst, size = 6)+
             ggplot2::xlab('Specificity (tau)')+
-            ggplot2::ylab('QN Expression')+
+            ggplot2::ylab('Expression')+
             ggplot2::scale_x_continuous(limits = c(0,1), breaks = round(seq(min(0), max(1), by = 0.2), 1))+
             ggplot2::scale_y_continuous(limits = c(0,14), breaks = round(seq(min(0), max(14), by = 2), 1))+
             ggplot2::stat_smooth(method = 'auto', level = 0.99, colour = "red", linetype = "dashed", size = 1, na.rm = TRUE)+
@@ -158,7 +158,7 @@ plotCorr <- function(x,y){
             ggplot2::guides(fill = FALSE)+
             ggplot2::annotate("text", x = 0.95, y = 14, label = corEst, size = 6)+
             ggplot2::xlab('Specificity (frac)')+
-            ggplot2::ylab('QN Expression')+
+            ggplot2::ylab('Expression')+
             ggplot2::scale_x_continuous(limits = c(0,1), breaks = round(seq(min(0), max(1), by = 0.2), 1))+
             ggplot2::scale_y_continuous(limits = c(0,14), breaks = round(seq(min(0), max(14), by = 2), 1))+
             ggplot2::stat_smooth(method = 'auto', level = 0.99, colour = "red", linetype = "dashed", size = 1, na.rm = TRUE)+

@@ -15,7 +15,7 @@ getOptimum(x, y, z)
 \item{z}{number of genes}
 }
 \value{
-Returns a list of 2 objects: dataframe and barplot. The dataframe is a 
+Returns a list of 2 objects: a dataframe and a ggplot barplot. The dataframe is a 
 subset of the output of getTissue(), containing only the optimum gene set.
 The barplot shows only the tissues in which the optimum genes are expressed 
 and the specificity of those genes for those tissues. Red dotted line: 0.85 

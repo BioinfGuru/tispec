@@ -39,7 +39,7 @@ correlation.
 \examples{
 # Choose Input
 corrPlots <- plotCorr(tissueA) # without user genes of interest
-corrPlots <- plotCorr(tissueA, c('Col4a3', 'Ifnb1')) # vector of genes
+corrPlots <- plotCorr(tissueA, c('Col4a3', 'Mboat7')) # vector of genes
 corrPlots <- plotCorr(tissueA, optimum$dataframe$external_gene_name) # output from getOptimum
 
 # View results
