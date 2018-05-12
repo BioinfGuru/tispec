@@ -58,7 +58,7 @@ plotCorr <- function(x,y){
             ggplot2::ylab('Expression')+
             ggplot2::scale_x_continuous(limits = c(0,1), breaks = round(seq(min(0), max(1), by = 0.2), 1))+
             ggplot2::scale_y_continuous(limits = c(0,14), breaks = round(seq(min(0), max(14), by = 2), 1))+
-            ggplot2::stat_smooth(method = 'auto', level = 0.99, colour = "red", linetype = "dashed", size = 1, na.rm = TRUE)+
+            ggplot2::stat_smooth(method = 'lm', level = 0.99, colour = "red", linetype = "dashed", size = 1, na.rm = TRUE)+
             ggplot2::theme_bw()+
             ggplot2::theme(
                 plot.title = ggplot2::element_text(size = 20, face = "bold", hjust = 0.5),
@@ -88,7 +88,7 @@ plotCorr <- function(x,y){
             ggplot2::ylab('Expression')+
             ggplot2::scale_x_continuous(limits = c(0,1), breaks = round(seq(min(0), max(1), by = 0.2), 1))+
             ggplot2::scale_y_continuous(limits = c(0,14), breaks = round(seq(min(0), max(14), by = 2), 1))+
-            ggplot2::stat_smooth(method = 'auto', level = 0.99, colour = "red", linetype = "dashed", size = 1, na.rm = TRUE)+
+            ggplot2::stat_smooth(method = 'lm', level = 0.99, colour = "red", linetype = "dashed", size = 1, na.rm = TRUE)+
             ggplot2::theme_bw()+
             ggplot2::theme(
                 plot.title = ggplot2::element_text(size = 20, face = "bold", hjust = 0.5),
@@ -129,7 +129,7 @@ plotCorr <- function(x,y){
             ggplot2::ylab('Expression')+
             ggplot2::scale_x_continuous(limits = c(0,1), breaks = round(seq(min(0), max(1), by = 0.2), 1))+
             ggplot2::scale_y_continuous(limits = c(0,14), breaks = round(seq(min(0), max(14), by = 2), 1))+
-            ggplot2::stat_smooth(method = 'auto', level = 0.99, colour = "red", linetype = "dashed", size = 1, na.rm = TRUE)+
+            ggplot2::stat_smooth(method = 'lm', level = 0.99, colour = "red", linetype = "dashed", size = 1, na.rm = TRUE)+
             ggplot2::theme_bw()+
             ggplot2::theme(
                 plot.title = ggplot2::element_text(size = 20, face = "bold", hjust = 0.5),
@@ -161,7 +161,7 @@ plotCorr <- function(x,y){
             ggplot2::ylab('Expression')+
             ggplot2::scale_x_continuous(limits = c(0,1), breaks = round(seq(min(0), max(1), by = 0.2), 1))+
             ggplot2::scale_y_continuous(limits = c(0,14), breaks = round(seq(min(0), max(14), by = 2), 1))+
-            ggplot2::stat_smooth(method = 'auto', level = 0.99, colour = "red", linetype = "dashed", size = 1, na.rm = TRUE)+
+            ggplot2::stat_smooth(method = 'lm', level = 0.99, colour = "red", linetype = "dashed", size = 1, na.rm = TRUE)+
             ggplot2::theme_bw()+
             ggplot2::theme(
                 plot.title = ggplot2::element_text(size = 20, face = "bold", hjust = 0.5),

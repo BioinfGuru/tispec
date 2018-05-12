@@ -12,6 +12,10 @@ output:
         toc_float:
             collapsed: TRUE
             smooth_scroll: FALSE
+vignette: >
+    %\VignetteEngine{knitr::rmarkdown}
+    %\VignetteIndexEntry{UserGuide}
+    %\VignetteEncoding{UTF-8}
 ---
 
 ```{r setup, include = FALSE}
@@ -86,7 +90,7 @@ The key conclusions of the benchmark were as follows:
 include_graphics(paste(wd,'workflow.png',sep = ''))
 ```
 
-The workflow (fig. 1) first log transforms the expression values provided by the user. To make cross-tissue comparisons possible, quantile normalizing is performed on the entire dataframe, after which each gene is given a bin value between 0-10 for each tissue. The higher the bin value, the greater the expression. The list of bin values of a gene is then passed to the TAU algorithm to calculate it's specificity for any tissue. Finally, the specificity of each gene for each individual tissue is calculated (Tau Expression Fraction).
+The workflow (fig. 1) first log transforms the expression values provided by the user. To make cross-tissue comparisons possible, quantile normalizing is performed on the entire dataframe, after which each gene is given a bin value between 0-10 for each tissue. The higher the bin value, the greater the expression. The list of bin values of a gene is then passed to the tau algorithm to calculate it's specificity for any tissue. Finally, the specificity of each gene for each individual tissue is calculated (tau expression fraction, tef).
 
 ## Input
 
@@ -132,7 +136,7 @@ After normalisation, implementation of the tau specificity algorithm assigns eac
     * Genes expressed in many (or all) tissues with no enriched expression
     * Defined by a tau value of at most 0.2.
 
-The tau value only defines the "specificity" of a gene. To determine which tissue the gene is actually specific for, requires calculation of tau expression fractions (Tef). As can be seen in the worked example in figure 2, gene X is a HSG with a tau value of 0.95. However, calculating Tef identifies that Gene X is highly specific for tissue B (0.95 Tef), with additional but much lower specificity for tissue C (0.24 Tef). Targetting gene X in tissue B, may produce off-target effects in tissue C.
+The tau value only defines the "specificity" of a gene. To determine which tissue the gene is actually specific for, requires calculation of tau expression fractions (tef). As can be seen in the worked example in figure 2, gene X is a HSG with a tau value of 0.95. However, calculating tef identifies that Gene X is highly specific for tissue B (0.95 tef), with additional but much lower specificity for tissue C (0.24 tef). Targetting gene X in tissue B, may produce off-target effects in tissue C.
 
 ```{r, eval=FALSE}
 tauExp <- calcTau(qnExp) 
@@ -164,7 +168,7 @@ The dataframe output now contains all the information required for easy user int
 plotDensity(tauAnno) 
 ```
 
-Notice the similarity between the shape of this plot andTau plotted in Figure 1 with a peak at tau>0.95. The plots are not highly similar because here a much reduced dataset is plotted (~9k genes only). Expect a distribution similar to Figure 1 when all annotated genes are included (~40k genes).
+Notice the similarity between the shape of this plot and tau plotted in Figure 1 with a peak at tau>0.95. The plots are not highly similar because here a much reduced dataset is plotted (~9k genes only). Expect a distribution similar to Figure 1 when all annotated genes are included (~40k genes).
 
 ## Specific gene counts
 
@@ -232,7 +236,7 @@ By plotting the tau value against expression we see that as the specificity of a
 corrPlots$fracPlot
 ```
 
-By plotting the tau expression value against expression we see that as specificity of a gene **for tissueA** increases above 0.1, there is actually little effect on expression in tissueA. There is a positive correlation (r = 0.52). However, the trendline shows an initial strong positive correlation that plateaus above 0.1 specificity (frac). This is clearly shown by the wide range of expression of genes that are absolutely specific (orange) or highly specific (yellow) for tissueA. From this plot we can now see that of both genes passed by the user, only Col4a3 is highly specific to tissueA because the tau expression fractions for tissueA were used. To extract genes that are both highly specific and highly expressed use [getOptimum](#getOptimum). Try passing the results of getOptimum to this function: in what area of the scatter plot do you think those genes will be plotted? 
+By plotting the tau expression value against expression the trendline now shows a positive correlation (r = 0.52) suggesting that as specificity of a gene **for tissueA** increases, so does expression of the gene in tissueA. As the linear model may be underfitting, I also used a generalized additive model to plot the trendline (not shown) which revealed an initial strong positive correlation that plateaus at 0.1 specificity suggesting that specificity above 0.1tef is a poor indicator of expression, and vice versa. This is clearly illustrated by the wide range of expression of genes that are absolutely specific (orange) or highly specific (yellow) for tissueA. From this plot we can now see that of both genes passed by the user, only Col4a3 is highly specific to tissueA because the tau expression fractions for tissueA were used. To extract genes that are both highly specific and highly expressed use [getOptimum](#getOptimum). Try passing the results of getOptimum to this function: in what area of the scatter plot do you think those genes will be plotted? 
 
 ### Get a set of control genes {#getControls}
 
